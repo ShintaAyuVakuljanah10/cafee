@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="favicon.ico">
+    <title>@yield('title', 'Dashboard')</title>
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="{{ asset('tinydash/css/simplebar.css') }}">
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="{{ asset('tinydash/css/feather.css') }}">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="{{ asset('tinydash/css/daterangepicker.css') }}">
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{{ asset('tinydash/css/app-light.css') }}" id="lightTheme">
+    <link rel="stylesheet" href="{{ asset('tinydash/css/app-dark.css') }}" id="darkTheme" disabled>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.materialdesignicons.com/6.6.96/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.materialdesignicons.com/7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+      <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+  </head>
+  <body class="vertical  light  ">
+    <div class="wrapper">
+      <nav class="topnav navbar navbar-light">
+        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+          <i class="fe fe-menu navbar-toggler-icon"></i>
+        </button>
+        <form class="form-inline mr-auto searchform text-muted">
+          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
+        </form>
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+              <span class="fe fe-grid fe-16"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar avatar-sm mt-2">
+                <img src="{{ asset('tinydash/assets/avatars/face-1.jpg') }}" alt="..." class="avatar-img rounded-circle">
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="#">Settings</a>
+              <a class="dropdown-item" href="#">Activities</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
+        <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
+          <i class="fe fe-x"><span class="sr-only"></span></i>
+        </a>
+        <nav class="vertnav navbar navbar-light">
+          <div class="w-100 mb-4 d-flex">
+              <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
+                  <svg version="1.1" id="logo" class="navbar-brand-img brand-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 120 120" xml:space="preserve">
+                      <g>
+                          <polygon class="st0" points="78,105 15,105 24,87 87,87" />
+                          <polygon class="st0" points="96,69 33,69 42,51 105,51" />
+                          <polygon class="st0" points="78,33 15,33 24,15 87,15" />
+                      </g>
+                  </svg>
+              </a>
+          </div>
+
+          @php
+          $user = auth()->user();
+          $menus = $user && $user->role
+              ? $user->role->menus()
+                  ->with(['submenus' => function ($q) {
+                      $q->orderBy('sort_order');
+                  }])
+                  ->orderBy('sort_order')
+                  ->get()
+              : collect();
+          @endphp
+
+          <ul class="navbar-nav flex-fill w-100 mb-2">
+              @foreach ($menus as $menu)
+                  @php
+                  $allowedSubs = $menu->submenus ?? collect();
+                  // Cek apakah ada submenu yang sedang aktif
+                  $isOpen = $allowedSubs->pluck('route')->contains(fn ($r) => request()->routeIs($r));
+                  @endphp
+
+                  {{-- JIKA TIDAK PUNYA SUBMENU --}}
+                  @if ($allowedSubs->isEmpty())
+                      <li class="nav-item w-100 {{ request()->routeIs($menu->route) ? 'active' : '' }}">
+                          <a class="nav-link" href="{{ !empty($menu->route) ? route($menu->route) : '#' }}">
+                              <i class="{{ $menu->icon }} fe-16"></i>
+                              <span class="ml-3 item-text">{{ $menu->name }}</span>
+                          </a>
+                      </li>
+
+                  {{-- JIKA PUNYA SUBMENU --}}
+                  @else
+                      <li class="nav-item dropdown w-100">
+                          <a href="#menu-{{ $menu->id }}" data-toggle="collapse" aria-expanded="{{ $isOpen ? 'true' : 'false' }}" 
+                            class="dropdown-toggle nav-link {{ $isOpen ? 'active' : '' }}">
+                              <i class="{{ $menu->icon }} fe-16"></i>
+                              <span class="ml-3 item-text">{{ $menu->name }}</span>
+                          </a>
+                          <ul class="collapse list-unstyled pl-4 w-100 {{ $isOpen ? 'show' : '' }}" id="menu-{{ $menu->id }}">
+                              @foreach ($allowedSubs as $sub)
+                                  <li class="nav-item {{ request()->routeIs($sub->route) ? 'active' : '' }}">
+                                      <a class="nav-link pl-3" href="{{ route($sub->route) }}">
+                                          <span class="ml-1 item-text">{{ $sub->name }}</span>
+                                      </a>
+                                  </li>
+                              @endforeach
+                          </ul>
+                      </li>
+                  @endif
+              @endforeach
+          </ul>
+        </nav>
+      </aside>
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              @yield('content')
+            </div> <!-- .col-12 -->
+          </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+        <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-box fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Package has uploaded successfull</strong></small>
+                        <div class="my-0 text-muted small">Package is zipped and uploaded</div>
+                        <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-download fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Widgets are updated successfull</strong></small>
+                        <div class="my-0 text-muted small">Just create new layout Index, form, table</div>
+                        <small class="badge badge-pill badge-light text-muted">2m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-inbox fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Notifications have been sent</strong></small>
+                        <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo</div>
+                        <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                      </div>
+                    </div> <!-- / .row -->
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-link fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Link was attached to menu</strong></small>
+                        <div class="my-0 text-muted small">New layout has been attached to the menu</div>
+                        <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                      </div>
+                    </div>
+                  </div> <!-- / .row -->
+                </div> <!-- / .list-group -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body px-5">
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-success justify-content-center">
+                      <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Control area</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Activity</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Droplet</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Upload</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Users</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Settings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main> <!-- main -->
+    </div> <!-- .wrapper -->
+    <script src="{{ asset('tinydash/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/popper.min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/moment.min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/daterangepicker.js') }}"></script>
+    <script src="{{ asset('tinydash/js/jquery.stickOnScroll.js') }}"></script>
+    <script src="{{ asset('tinydash/js/tinycolor-min.js') }}"></script>
+    <script src="{{ asset('tinydash/js/config.js') }}"></script>
+    <script src="{{ asset('tinydash/js/apps.js') }}"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        
+    {{-- <script src="https://cdn.tiny.cloud/1/e2kzbf6ud3uhuc9nqgzvsagy9crvxasztgheaapn2rayyfvf/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script> --}}
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag()
+      {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-56159088-1');
+    </script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    </script>
+
+    @stack('scripts')
+  </body>
+</html>
