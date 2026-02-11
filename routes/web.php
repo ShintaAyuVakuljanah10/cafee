@@ -7,6 +7,7 @@ use App\Http\Controllers\Backend\UserController;
 use App\Http\Controllers\Backend\RoleController;
 use App\Http\Controllers\Backend\MenuController;
 use App\Http\Controllers\Backend\SubMenuController;
+use App\Http\Controllers\Backend\MejaController;
 
 Route::get('/', function () {
     return view('cek');
@@ -70,3 +71,31 @@ Route::prefix('backend')->group(function () {
     Route::put('submenu/{id}', [SubMenuController::class, 'update']);
     Route::delete('submenu/{id}', [SubMenuController::class, 'destroy']);
 });
+Route::prefix('backend')->middleware(['auth'])->group(function () {
+    // Rute untuk menampilkan daftar meja
+    Route::get('/meja', [MejaController::class, 'index'])->name('meja.index');
+    
+    // Rute untuk memproses tambah meja
+    Route::post('/meja/store', [MejaController::class, 'store'])->name('meja.store');
+    
+    // Rute untuk cetak QR (Ini yang sedang error di tempat Anda)
+    Route::get('/meja/print/{id}', [MejaController::class, 'downloadQr'])->name('meja.print');
+});
+// Rute untuk Pelanggan (ketika QR di-scan)
+Route::get('/order/{uuid}', function($uuid) {
+    // 1. Cari meja berdasarkan UUID
+    $meja = \App\Models\Backend\Meja::where('uuid', $uuid)->firstOrFail();
+    
+    // 2. Simpan informasi meja ke session (agar sistem ingat pelanggan duduk di mana)
+    session([
+        'id_meja' => $meja->id,
+        'nomor_meja' => $meja->nomor_meja
+    ]);
+
+    // 3. Sementara tampilkan teks saja dulu (Nanti ganti ke halaman menu asli)
+    return "<h1>Selamat Datang di Kafe!</h1> 
+            <p>Anda sedang berada di <b>Meja " . $meja->nomor_meja . "</b></p>
+            <p>Halaman menu sedang dalam pengembangan.</p>";
+            
+})->name('pelanggan.menu'); // NAMA INI WAJIB ADA agar tidak error lagi
+
