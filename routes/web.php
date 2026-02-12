@@ -11,9 +11,14 @@ use App\Http\Controllers\Backend\MejaController;
 use App\Http\Controllers\Backend\AplikasiController;
 use App\Http\Controllers\Backend\FileManagerController;
 use App\Http\Controllers\Backend\CategoryController;
+use App\Http\Controllers\Backend\MakananController;
+use App\Http\Controllers\Backend\SubMakananController;
+use App\Http\Controllers\Frontend\FrontendController;
 
 // --- GUEST / PUBLIC ROUTES ---
-Route::get('/', function () { return view('cek'); });
+Route::get('/', [FrontendController::class, 'index']);
+Route::get('/menu/{id}', [FrontendController::class, 'detail'])->name('menu.detail');
+Route::post('/cart/add', [FrontendController::class, 'addToCart'])->name('cart.add');
 Route::get('/backend', function () { return view('auth.login'); });
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
@@ -104,5 +109,23 @@ Route::middleware(['auth'])->prefix('backend')->name('backend.')->group(function
         Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');
+    });
+    Route::prefix('makanan')->name('makanan.')->group(function () {
+        Route::get('/', [MakananController::class, 'index'])->name('index');
+        Route::get('/data', [MakananController::class, 'data'])->name('data');
+        Route::post('/store', [MakananController::class, 'store'])->name('store');
+        Route::put('/{id}', [MakananController::class, 'update'])->name('update');
+        Route::delete('/{id}', [MakananController::class, 'destroy'])->name('destroy');
+    });
+    
+    Route::prefix('sub-makanan')->name('sub-makanan.')->group(function () {
+
+        Route::get('/', [SubMakananController::class, 'index'])->name('index');
+        Route::get('/data', [SubMakananController::class, 'data'])->name('data');
+        Route::get('/{id}', [SubMakananController::class, 'edit'])->name('edit');
+    
+        Route::post('/store', [SubMakananController::class, 'store'])->name('store');
+        Route::put('/{id}', [SubMakananController::class, 'update'])->name('update');
+        Route::delete('/{id}', [SubMakananController::class, 'destroy'])->name('destroy');
     });
 });

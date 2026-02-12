@@ -56,22 +56,24 @@
 @endsection
 @push('scripts')
 <script>
-$(document).ready(function () {
+    $(document).ready(function () {
 
-    $.ajaxSetup({
-        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-    });
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-    loadFiles();
+        loadFiles();
 
-    function loadFiles() {
-        $.get("{{ route('backend.fileManager.data') }}", function (data) {
-            let html = '';
-            if (data.length === 0) {
-                html = '<div class="col-12 text-center">Belum ada gambar</div>';
-            } else {
-                $.each(data, function (i, item) {
-                    html += `
+        function loadFiles() {
+            $.get("{{ route('backend.fileManager.data') }}", function (data) {
+                let html = '';
+                if (data.length === 0) {
+                    html = '<div class="col-12 text-center">Belum ada gambar</div>';
+                } else {
+                    $.each(data, function (i, item) {
+                        html += `
                     <div class="col-md-3 mb-4">
                         <div class="card">
                             <img src="/storage/${item.gambar}" class="card-img-top" style="height:250px;object-fit:cover">
@@ -83,97 +85,99 @@ $(document).ready(function () {
                             </div>
                         </div>
                     </div>`;
-                });
-            }
-            $('#file-grid').html(html);
-        });
-    }
-
-    $('#btnAdd').click(function () {
-        $('#formFile')[0].reset();
-        $('.text-danger').text('');
-        $('#modalFile').modal('show');
-    });
-
-    $('#formFile').submit(function (e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-
-        $.ajax({
-            url: "{{ route('backend.fileManager.store') }}",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function () {
-                $('#modalFile').modal('hide');
-                loadFiles();
-
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Upload berhasil',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    $('.error-judul').text(errors.judul ?? '');
-                    $('.error-gambar').text(errors.gambar ?? '');
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Terjadi kesalahan pada server'
                     });
                 }
-            }
+                $('#file-grid').html(html);
+            });
+        }
 
+        $('#btnAdd').click(function () {
+            $('#formFile')[0].reset();
+            $('.text-danger').text('');
+            $('#modalFile').modal('show');
         });
-    });
-    
 
-    $(document).on('click', '.delete', function () {
-        let id = $(this).data('id');
-        Swal.fire({
-            title: 'Yakin?',
-            text: 'Gambar ini akan dihapus permanen!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: `/fileManager/${id}`,
-                    type: 'DELETE',
-                    success: function () {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Terhapus',
-                            text: 'Gambar berhasil dihapus',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        loadFiles();
-                    },
-                    error: function () {
+        $('#formFile').submit(function (e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: "{{ route('backend.fileManager.store') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    $('#modalFile').modal('hide');
+                    loadFiles();
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Upload berhasil',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+
+                error: function (xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        $('.error-judul').text(errors.judul ?? '');
+                        $('.error-gambar').text(errors.gambar ?? '');
+                    } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: 'Gambar gagal dihapus'
+                            text: 'Terjadi kesalahan pada server'
                         });
                     }
-                });
-            }
+                }
+
+            });
+        });
+
+
+        $(document).on('click', '.delete', function () {
+
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Gambar ini akan dihapus permanen!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        url: "{{ route('backend.fileManager.destroy', ':id') }}"
+                            .replace(':id', id),
+                        type: 'DELETE',
+                        success: function () {
+                            loadFiles();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        },
+                        error: function (xhr) {
+                            console.log(xhr.responseText);
+                            Swal.fire('Error', 'Gagal menghapus', 'error');
+                        }
+                    });
+
+                }
+
+            });
         });
 
     });
-
-});
 </script>
 @endpush
