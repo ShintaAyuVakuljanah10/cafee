@@ -105,34 +105,61 @@
                   $isOpen = $allowedSubs->pluck('route')->contains(fn ($r) => request()->routeIs($r));
                   @endphp
 
-                  {{-- JIKA TIDAK PUNYA SUBMENU --}}
-                  @if ($allowedSubs->isEmpty())
-                      <li class="nav-item w-100 {{ request()->routeIs($menu->route) ? 'active' : '' }}">
-                          <a class="nav-link" href="{{ !empty($menu->route) ? route($menu->route) : '#' }}">
-                              <i class="{{ $menu->icon }} fe-16"></i>
-                              <span class="ml-3 item-text">{{ $menu->name }}</span>
-                          </a>
-                      </li>
-
-                  {{-- JIKA PUNYA SUBMENU --}}
-                  @else
-                      <li class="nav-item dropdown w-100">
-                          <a href="#menu-{{ $menu->id }}" data-toggle="collapse" aria-expanded="{{ $isOpen ? 'true' : 'false' }}" 
-                            class="dropdown-toggle nav-link {{ $isOpen ? 'active' : '' }}">
-                              <i class="{{ $menu->icon }} fe-16"></i>
-                              <span class="ml-3 item-text">{{ $menu->name }}</span>
-                          </a>
-                          <ul class="collapse list-unstyled pl-4 w-100 {{ $isOpen ? 'show' : '' }}" id="menu-{{ $menu->id }}">
-                              @foreach ($allowedSubs as $sub)
-                                  <li class="nav-item {{ request()->routeIs($sub->route) ? 'active' : '' }}">
-                                      <a class="nav-link pl-3" href="{{ route($sub->route) }}">
-                                          <span class="ml-1 item-text">{{ $sub->name }}</span>
-                                      </a>
-                                  </li>
-                              @endforeach
-                          </ul>
-                      </li>
-                  @endif
+              @if ($allowedSubs->isEmpty())
+                  @php
+                      // Logika cerdas: cek apakah route butuh .index atau tidak
+                      $routeName = 'backend.' . $menu->route;
+                      if (!Route::has($routeName)) {
+                          $routeName = 'backend.' . $menu->route . '.index';
+                      }
+                  @endphp
+                  
+                  <li class="nav-item w-100 {{ request()->routeIs($routeName) ? 'active' : '' }}">
+                      <a class="nav-link" href="{{ !empty($menu->route) && Route::has($routeName) ? route($routeName) : '#' }}">
+                          <i class="{{ $menu->icon }} fe-16"></i>
+                          <span class="ml-3 item-text">{{ $menu->name }}</span>
+                      </a>
+                  </li>
+                @else
+                    @php
+                        // Pastikan $isOpen mendeteksi dengan benar
+                        $isOpen = false;
+                        foreach ($allowedSubs as $sub) {
+                            $checkName = 'backend.' . $sub->route;
+                            if (request()->routeIs($checkName . '*') || request()->routeIs($checkName . '.index')) {
+                                $isOpen = true;
+                                break;
+                            }
+                        }
+                    @endphp
+                    
+                    <li class="nav-item dropdown w-100 {{ $isOpen ? 'active' : '' }}">
+                        <a href="#menu-{{ $menu->id }}" 
+                          data-toggle="collapse" {{-- Ganti ke data-toggle jika BS4 --}}
+                          aria-expanded="{{ $isOpen ? 'true' : 'false' }}" 
+                          class="dropdown-toggle nav-link">
+                            <i class="{{ $menu->icon }} fe-16"></i>
+                            <span class="ml-3 item-text">{{ $menu->name }}</span>
+                        </a>
+                        {{-- Gunakan class collapse yang benar --}}
+                        <ul class="collapse list-unstyled pl-4 w-100 {{ $isOpen ? 'show' : '' }}" 
+                            id="menu-{{ $menu->id }}">
+                            @foreach ($allowedSubs as $sub)
+                                @php
+                                    $subRouteName = 'backend.' . $sub->route;
+                                    if (!Route::has($subRouteName)) {
+                                        $subRouteName = $subRouteName . '.index';
+                                    }
+                                @endphp
+                                <li class="nav-item {{ request()->routeIs($subRouteName) ? 'active' : '' }}">
+                                    <a class="nav-link pl-3" href="{{ Route::has($subRouteName) ? route($subRouteName) : '#' }}">
+                                        <span class="ml-1 item-text">{{ $sub->name }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
+                @endif
               @endforeach
           </ul>
         </nav>

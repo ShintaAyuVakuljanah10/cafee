@@ -96,7 +96,7 @@
         loadRoles();
 
         function loadRoles() {
-            $.get("{{ route('roles.data') }}", function (data) {
+            $.get("{{ route('backend.roles.data') }}", function (data) {
 
                 rolesTable.clear();
 
@@ -156,17 +156,36 @@
         $(document).on('click', '.btn-edit', function () {
             let id = $(this).data('id');
 
-            $.get(`/roles/${id}/edit`, function (res) {
+            // TAMBAHKAN /backend/ di depan URL
+            $.get(`/backend/roles/${id}/edit`, function (res) {
                 $('#role_id').val(res.id);
                 $('#name').val(res.name);
 
                 $('.menu-checkbox').prop('checked', false);
-                res.menus.forEach(menu => {
-                    $('.menu-checkbox[value="' + menu.id + '"]').prop('checked', true);
-                });
+                if (res.menus) {
+                    res.menus.forEach(menu => {
+                        $(`.menu-checkbox[value="${menu.id}"]`).prop('checked', true);
+                    });
+                }
 
                 $('#modalTitle').text('Edit Role');
                 $('#modalRole').modal('show');
+            }).fail(function(xhr) {
+                console.error(xhr.responseText);
+                alert("Gagal memuat data. Pastikan URL sudah benar (/backend/roles/...)");
+            });
+        });
+        
+        $('#formRole').submit(function (e) {
+            e.preventDefault();
+            let id = $('#role_id').val();
+            
+            // Sesuaikan URL store dan update dengan prefix /backend/
+            let url = id ? `/backend/roles/update/${id}` : `/backend/roles/store`;
+
+            $.post(url, $(this).serialize(), function () {
+                $('#modalRole').modal('hide');
+                loadRoles();
             });
         });
 

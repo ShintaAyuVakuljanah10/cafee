@@ -12042,3 +12042,15 @@ a.uppy-Dashboard-poweredBy {
     font-size: 35px;
     top: -10px;
     right: -35px; } }
+.form-label{
+    font-weight: 600;
+}
+/* Pastikan dropdown Select2 tampil di atas modal dan memiliki batas tinggi */
+.select2-container--open {
+    z-index: 9999999 !important;
+}
+
+.select2-results__options {
+    max-height: 200px; /* Batasi tinggi agar muncul scrollbar */
+    overflow-y: auto;
+}

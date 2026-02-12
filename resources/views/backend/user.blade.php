@@ -132,7 +132,7 @@ $(document).ready(function () {
     loadUsers();
 
     function loadUsers() {
-        $.get("{{ route('user.data') }}", function (data) {
+        $.get("{{ route('backend.user.data') }}", function (data) {
 
             console.log('RESPON AJAX:', data);
 
@@ -193,7 +193,7 @@ $(document).ready(function () {
         let formData = new FormData(this);
         $('.text-danger').text('');
         let userId = $('#user_id').val();
-        let url = userId ? `/users/${userId}` : "{{ route('user.tambah') }}";
+        let url = userId ? `/user/${userId}` : "{{ route('backend.user.tambah') }}";
         let type = 'POST';
 
         if(userId){
@@ -242,7 +242,8 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-edit', function () {
         let userId = $(this).data('id');
-        $.get(`/users/${userId}/edit`, function (data) {
+        // Hilangkan huruf 's' pada /users/ agar menjadi /user/
+        $.get(`/user/${userId}/edit`, function (data) { 
             $('#modalTitle').text('Edit User');
             $('#btnSave').text('Update');
             $('#user_id').val(data.id);

@@ -409,15 +409,15 @@
         });
 
         $('#route').select2({
+            theme: 'bootstrap4',
             placeholder: 'Pilih Route',
             allowClear: true,
+            dropdownParent: $('#modalMenu'), // Pastikan ID modal sesuai
+            width: '100%', // Agar lebar input konsisten
             ajax: {
                 url: "{{ route('backend.menu.routeSelect') }}",
                 dataType: 'json',
                 delay: 250,
-                data: function (params) {
-                    return { q: params.term };
-                },
                 processResults: function (data) {
                     return { results: data };
                 }

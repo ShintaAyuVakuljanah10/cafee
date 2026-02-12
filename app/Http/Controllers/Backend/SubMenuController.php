@@ -6,12 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BackEnd\SubMenu;
 use App\Models\BackEnd\Menu;
+use Illuminate\Support\Facades\Route;
 
 class SubMenuController extends Controller
 {
     public function index()
     {
-        return view('backend.submenu');
+        $routes = collect(Route::getRoutes())->filter(function ($route) {
+            return str_contains($route->getName(), 'backend.');
+        })->map(function ($route) {
+            $name = $route->getName();
+            // Menghilangkan 'backend.' dan '.index'
+            $cleaned = str_replace(['backend.', '.index'], '', $name);
+            return [
+                'original' => $name,
+                'cleaned'  => $cleaned
+            ];
+        })->values();
+
+        return view('backend.submenu', compact('routes'));
     }
 
     public function data()
@@ -26,7 +39,8 @@ class SubMenuController extends Controller
                     'icon'        => $item->icon ?? '-',
                     'route'       => $item->route,
                     'parent_id'   => $item->parent_id,
-                    'parent_name' => $item->parent->name ?? '-',
+                    // Pastikan key ini yang digunakan atau kirim object parent-nya
+                    'parent_name' => $item->parent->name ?? '-', 
                     'active'      => $item->active,
                 ];
             });
@@ -43,6 +57,10 @@ class SubMenuController extends Controller
             'parent_id' => 'required|exists:menus,id',
             'active'    => 'boolean',
         ]);
+        
+        if (!empty($data['route'])) {
+            $data['route'] = str_replace(['backend.', '.index'], '', $data['route']);
+        }
 
         SubMenu::create($data);
 
@@ -65,6 +83,10 @@ class SubMenuController extends Controller
             'parent_id' => 'required|exists:menus,id',
             'active'    => 'boolean',
         ]);
+
+        if (!empty($data['route'])) {
+            $data['route'] = str_replace(['backend.', '.index'], '', $data['route']);
+        }
 
         $submenu->update($data);
 
