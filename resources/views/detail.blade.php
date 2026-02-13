@@ -1,209 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.frontend')
 
-<head>
-    <meta charset="utf-8">
-    <title>Restoran - Bootstrap Restaurant Template</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+@section('content')
 
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+<style>
+    .detail-wrapper {
+        padding: 80px 0;
+    }
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
-        rel="stylesheet">
+    .product-img {
+        width: 100%;
+        max-height: 450px;
+        object-fit: cover;
+        border-radius: 20px;
+    }
 
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    .price-tag {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0d6efd;
+    }
 
-    <!-- Libraries Stylesheet -->
-    <link href="{{ asset('restoran/lib/animate/animate.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('restoran/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('restoran/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet" />
+    .varian-item {
+        border: 1px solid #eaeaea;
+        border-radius: 14px;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+        transition: 0.2s ease;
+        cursor: pointer;
+    }
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="{{ asset('restoran/css/bootstrap.min.css') }}" rel="stylesheet">
+    .varian-item:hover {
+        border-color: #0d6efd;
+        background: #f8fbff;
+    }
 
-    <!-- Template Stylesheet -->
-    <link href="{{ asset('restoran/css/style.css') }}" rel="stylesheet">
-</head>
+    .qty-box {
+        width: 90px;
+        text-align: center;
+    }
+</style>
 
-<body>
-    <div class="container-xxl bg-white p-0">
-        <!-- Spinner Start -->
-        <div id="spinner"
-            class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
+<section class="detail-wrapper">
+    <div class="container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{{ asset('storage/'.$makanan->gambar) }}"
+                     class="product-img shadow-sm">
             </div>
-        </div>
-        <!-- Spinner End -->
 
+            <div class="col-lg-6">
 
-        <!-- Navbar & Hero Start -->
-        <div class="container-xxl position-relative p-0">
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
-                <a href="" class="navbar-brand p-0">
-                    <h1 class="text-primary m-0"><i class="fa fa-utensils me-3"></i>Restoran</h1>
+                <h1 class="fw-bold mb-2">
+                    {{ $makanan->nama }}
+                </h1>
+
+                <div class="price-tag mb-3">
+                    Rp {{ number_format($makanan->harga) }}
+                </div>
+
+                @if($makanan->deskripsi)
+                    <p class="text-muted mb-4">
+                        {{ $makanan->deskripsi }}
+                    </p>
+                @endif
+
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+
+                    <input type="hidden" name="makanan_id" value="{{ $makanan->id_makanan }}">
+                    <input type="hidden" name="nama" value="{{ $makanan->nama }}">
+                    <input type="hidden" name="harga" value="{{ $makanan->harga }}">
+                    <input type="hidden" name="gambar" value="{{ asset('storage/'.$makanan->gambar) }}">
+
+                    @if($makanan->subMakanans->count() > 0)
+                        <h5 class="fw-bold mb-3">Pilih Varian</h5>
+
+                        @foreach($makanan->subMakanans as $sub)
+                            <label class="varian-item w-100 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="radio"
+                                           name="sub_makanan"
+                                           value="{{ $sub->id }}"
+                                           class="form-check-input me-2">
+                                    {{ $sub->nama }}
+                                </div>
+                                <span class="fw-bold text-primary">
+                                    +Rp {{ number_format($sub->tambahan_harga) }}
+                                </span>
+                            </label>
+                        @endforeach
+                    @endif
+
+                    <div class="mt-4">
+                        <label class="fw-bold mb-2">Jumlah</label>
+                        <input type="number"
+                               name="qty"
+                               class="form-control qty-box"
+                               value="1"
+                               min="1">
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100 mt-4 shadow-sm">
+                        <i class="bi bi-cart-plus me-2"></i>
+                        Tambah ke Keranjang
+                    </button>
+                </form>
+
+                <a href="{{ url()->previous() }}"
+                   class="btn btn-outline-secondary w-100 mt-3 rounded-3">
+                    Kembali
                 </a>
 
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-
-                    <a href="#" class="btn btn-primary ms-auto mt-3 mb-3">
-                        <i class="bi bi-cart"></i>
-                    </a>
-
-                </div>
-
-            </nav>
-        </div>
-
-        <!-- Navbar & Hero End -->
-
-        <div class="container py-5">
-            <div class="row">
-                <div class="col-md-6">
-                    <img src="{{ asset('storage/'.$makanan->gambar) }}" class="img-fluid rounded">
-                </div>
-
-                <div class="col-md-6">
-                    <h2>{{ $makanan->nama }}</h2>
-                    <h4 class="text-primary">
-                        Rp {{ number_format($makanan->harga) }}
-                    </h4>
-
-                    <form action="{{ route('cart.add') }}" method="POST">
-                        @csrf
-
-                        <input type="hidden" name="makanan_id" value="{{ $makanan->id }}">
-                        <input type="hidden" name="nama" value="{{ $makanan->nama }}">
-                        <input type="hidden" name="harga" value="{{ $makanan->harga }}">
-
-                        {{-- Varian --}}
-                        @if($makanan->subMakanans->count() > 0)
-                        <h5 class="mt-4">Pilih Varian</h5>
-                        @foreach($makanan->subMakanans as $sub)
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sub_makanan" value="{{ $sub->id }}">
-                            <label class="form-check-label">
-                                {{ $sub->nama }}
-                                (+Rp {{ number_format($sub->tambahan_harga) }})
-                            </label>
-                        </div>
-                        @endforeach
-                        @endif
-
-                        {{-- Qty --}}
-                        <div class="mt-4">
-                            <label>Jumlah</label>
-                            <input type="number" name="qty" class="form-control w-25" value="1" min="1">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary mt-4">
-                            <i class="bi bi-cart-plus"></i>
-                            Tambah ke Keranjang
-                        </button>
-
-                    </form>
-                </div>
             </div>
         </div>
-
-
-        <!-- Footer Start -->
-        <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
-            <div class="container py-5">
-                <div class="row g-5">
-                    <div class="col-lg-3 col-md-6">
-                        <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Company</h4>
-                        <a class="btn btn-link" href="">About Us</a>
-                        <a class="btn btn-link" href="">Contact Us</a>
-                        <a class="btn btn-link" href="">Reservation</a>
-                        <a class="btn btn-link" href="">Privacy Policy</a>
-                        <a class="btn btn-link" href="">Terms & Condition</a>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Contact</h4>
-                        <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>123 Street, New York, USA</p>
-                        <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p>
-                        <p class="mb-2"><i class="fa fa-envelope me-3"></i>info@example.com</p>
-                        <div class="d-flex pt-2">
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Opening</h4>
-                        <h5 class="text-light fw-normal">Monday - Saturday</h5>
-                        <p>09AM - 09PM</p>
-                        <h5 class="text-light fw-normal">Sunday</h5>
-                        <p>10AM - 08PM</p>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <h4 class="section-title ff-secondary text-start text-primary fw-normal mb-4">Newsletter</h4>
-                        <p>Dolor amet sit justo amet elitr clita ipsum elitr est.</p>
-                        <div class="position-relative mx-auto" style="max-width: 400px;">
-                            <input class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text"
-                                placeholder="Your email">
-                            <button type="button"
-                                class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">SignUp</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                <div class="copyright">
-                    <div class="row">
-                        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                            &copy; <a class="border-bottom" href="#">Your Site Name</a>, All Right Reserved.
-
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a><br><br>
-                            Distributed By <a class="border-bottom" href="https://themewagon.com"
-                                target="_blank">ThemeWagon</a>
-                        </div>
-                        <div class="col-md-6 text-center text-md-end">
-                            <div class="footer-menu">
-                                <a href="">Home</a>
-                                <a href="">Cookies</a>
-                                <a href="">Help</a>
-                                <a href="">FQAs</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Footer End -->
-
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
+</section>
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('restoran/lib/wow/wow.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/easing/easing.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/waypoints/waypoints.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/counterup/counterup.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/owlcarousel/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/tempusdominus/js/moment.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
-    <script src="{{ asset('restoran/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
-
-    <!-- Template Javascript -->
-    <script src="{{ asset('restoran/js/main.js') }}"></script>
-</body>
-
-</html>
+@endsection

@@ -50,9 +50,9 @@
                         <label>Pilih Makanan</label>
                         <select id="id_makanan" class="form-control">
                             @foreach(\App\Models\Backend\Makanan::all() as $m)
-                                <option value="{{ $m->id_makanan }}">
-                                    {{ $m->nama }}
-                                </option>
+                            <option value="{{ $m->id_makanan }}">
+                                {{ $m->nama }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -81,46 +81,93 @@
 
 @push('scripts')
 <script>
-$(document).ready(function(){
+    $(document).ready(function () {
 
-    let table = $('#subTable').DataTable();
-    loadData();
+        let table = $('#subTable').DataTable();
+        loadData();
 
-    function loadData(){
-        $.get("{{ route('backend.sub-makanan.data') }}", function(data){
-            table.clear();
-            data.forEach((item, i)=>{
-                table.row.add([
-                    i+1,
-                    item.makanan.nama,
-                    item.nama,
-                    'Rp ' + item.tambahan_harga,
+        function loadData() {
+            $.get("{{ route('backend.sub-makanan.data') }}", function (data) {
+                table.clear();
+                data.forEach((item, i) => {
+                    table.row.add([
+                        i + 1,
+                        item.makanan.nama,
+                        item.nama,
+                        'Rp ' + item.tambahan_harga,
+                        `
+                    <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary edit" data-id="${item.id_sub_makanan}"><i class="mdi mdi-pencil"></i></button>
+                            <button class="btn btn-outline-danger delete" data-id="${item.id_sub_makanan}"><i class="mdi mdi-delete"></i></button>
+                        </div>
                     `
-                    <button class="btn btn-sm btn-danger delete" data-id="${item.id_sub_makanan}">
-                        <i class="mdi mdi-delete"></i>
-                    </button>
-                    `
-                ]);
+                    ]);
+                });
+                table.draw();
             });
-            table.draw();
-        });
-    }
+        }
 
-    $('#formSub').submit(function(e){
-        e.preventDefault();
+        $('#formSub').submit(function (e) {
+            e.preventDefault();
 
-        $.post("{{ route('backend.sub-makanan.store') }}", {
-            id_makanan: $('#id_makanan').val(),
-            nama: $('#nama_sub').val(),
-            tambahan_harga: $('#tambahan_harga').val(),
-            _token: "{{ csrf_token() }}"
-        }, function(){
-            $('#modalSub').modal('hide');
-            loadData();
-            Swal.fire('Berhasil!', 'Sub makanan ditambahkan', 'success');
+            $.post("{{ route('backend.sub-makanan.store') }}", {
+                id_makanan: $('#id_makanan').val(),
+                nama: $('#nama_sub').val(),
+                tambahan_harga: $('#tambahan_harga').val(),
+                _token: "{{ csrf_token() }}"
+            }, function () {
+                $('#modalSub').modal('hide');
+                loadData();
+                Swal.fire('Berhasil!', 'Sub makanan ditambahkan', 'success');
+            });
         });
+
+        $(document).on('click', '.edit', function () {
+            let id = $(this).data('id');
+
+            $.get("{{ route('backend.sub-makanan.data') }}", function (data) {
+                let item = data.find(x => x.id_sub_makanan == id);
+
+                if (item) {
+                    $('#id_sub').val(item.id_sub_makanan);
+                    $('#id_makanan').val(item.id_makanan);
+                    $('#nama_sub').val(item.nama);
+                    $('#tambahan_harga').val(item.tambahan_harga);
+
+                    $('.modal-title').text('Edit Sub Makanan');
+                    $('#modalSub').modal('show');
+                }
+            });
+        });
+
+        $(document).on('click', '.delete', function () {
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Yakin hapus?',
+                text: "Data tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/backend/sub-makanan/${id}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function () {
+                            loadData();
+                            Swal.fire('Terhapus!', 'Data berhasil dihapus.',
+                                'success');
+                        }
+                    });
+                }
+            });
+        });
+
     });
 
-});
 </script>
 @endpush

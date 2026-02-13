@@ -14,11 +14,17 @@ use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\MakananController;
 use App\Http\Controllers\Backend\SubMakananController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Frontend\CartController;
 
 // --- GUEST / PUBLIC ROUTES ---
 Route::get('/', [FrontendController::class, 'index']);
 Route::get('/menu/{id}', [FrontendController::class, 'detail'])->name('menu.detail');
+
 Route::post('/cart/add', [FrontendController::class, 'addToCart'])->name('cart.add');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+
 Route::get('/backend', function () { return view('auth.login'); });
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');

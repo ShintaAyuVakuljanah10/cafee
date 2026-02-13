@@ -125,12 +125,10 @@ $(document).ready(function(){
                         ? '<span class="badge badge-success">Aktif</span>'
                         : '<span class="badge badge-secondary">Nonaktif</span>',
                     `
-                    <button class="btn btn-sm btn-primary edit" data-id="${item.id_makanan}">
-                        <i class="mdi mdi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger delete" data-id="${item.id_makanan}">
-                        <i class="mdi mdi-delete"></i>
-                    </button>
+                    <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary edit" data-id="${item.id_makanan}"><i class="mdi mdi-pencil"></i></button>
+                            <button class="btn btn-outline-danger delete" data-id="${item.id_makanan}"><i class="mdi mdi-delete"></i></button>
+                        </div>
                     `
                 ]);
             });
