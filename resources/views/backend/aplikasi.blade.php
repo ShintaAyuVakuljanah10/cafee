@@ -79,26 +79,45 @@
         <h5 class="mb-3">Jam Operasional</h5>
 
 
-        {{-- Weekday --}}
-        <div class="row">
-
             {{-- Weekday --}}
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Jam Operasional Weekday</label>
-                <input type="text" name="weekday" class="form-control"
-                    placeholder="Contoh: Senin - Sabtu 09:00 - 21:00"
-                    value="{{ $aplikasi->weekday ?? '' }}">
+            
+            {{-- ===== HARI ===== --}}
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hari Weekday</label>
+                    <input type="text" name="weekday" class="form-control"
+                        placeholder="Contoh: Senin - Jumat"
+                        value="{{ $aplikasi->weekday ?? '' }}">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hari Weekend</label>
+                    <input type="text" name="weekend" class="form-control"
+                        placeholder="Contoh: Sabtu - Minggu"
+                        value="{{ $aplikasi->weekend ?? '' }}">
+                </div>
+
             </div>
 
-            {{-- Weekend --}}
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Jam Operasional Weekend</label>
-                <input type="text" name="weekend" class="form-control"
-                    placeholder="Contoh: Minggu 10:00 - 20:00"
-                    value="{{ $aplikasi->weekend ?? '' }}">
-            </div>
 
-        </div>
+            {{-- ===== JAM ===== --}}
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Jam Weekday</label>
+                    <input type="text" name="jam_weekday" class="form-control"
+                        placeholder="Contoh: 09:00 - 21:00"
+                        value="{{ $aplikasi->jam_weekday ?? '' }}">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Jam Weekend</label>
+                    <input type="text" name="jam_weekend" class="form-control"
+                        placeholder="Contoh: 10:00 - 22:00"
+                        value="{{ $aplikasi->jam_weekend ?? '' }}">
+                </div>
+            </div>
 
 
         <div class="text-end">

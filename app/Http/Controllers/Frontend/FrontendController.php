@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\backend\Aplikasi;
 use App\Models\Backend\Category;
 use App\Models\Backend\Makanan;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ class FrontendController extends Controller
 {
     public function index()
     {
+        $app = Aplikasi::first();
         $categories = Category::with([
             'makanans' => function ($query) {
                 $query->where('status', 'aktif')
@@ -18,7 +20,7 @@ class FrontendController extends Controller
             }
         ])->get();
 
-        return view('frontend', compact('categories'));
+        return view('frontend', compact('categories', 'app'));
     }
 
     public function detail($id)

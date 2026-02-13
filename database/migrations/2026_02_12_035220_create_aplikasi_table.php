@@ -19,8 +19,6 @@ return new class extends Migration
             $table->string('alamat')->nullable();
             $table->string('telepon')->nullable();
             $table->string('email')->nullable();
-            $table->string('jam_buka')->nullable();
-            $table->string('jam_tutup')->nullable();
             $table->string('weekday')->nullable();
             $table->string('weekend')->nullable();
             $table->timestamps();

@@ -17,5 +17,7 @@ class Aplikasi extends Model
         'email',
         'weekday',
         'weekend',
+        'jam_weekday',
+        'jam_weekend'
     ];
 }

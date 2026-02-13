@@ -31,11 +31,14 @@ class AplikasiController extends Controller
         $setting->email = $request->email;
         $setting->weekday = $request->weekday;
         $setting->weekend = $request->weekend;
+        $setting->weekday = $request->weekday;
+        $setting->jam_weekday = $request->jam_weekday;
+        $setting->jam_weekend = $request->jam_weekend;
 
         // upload gambar
         if ($request->hasFile('logo')) {
             $file = $request->file('logo')->store('setting','public');
-            $setting->banner = $file;
+            $setting->logo = $file;
         }
 
         $setting->save();
