@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\backend\Aplikasi;
 use App\Models\backend\SubMakanan;
 use Illuminate\Http\Request;
+use App\Models\backend\Makanan; // tambahkan ini
 
 class CartController extends Controller
 {
@@ -13,37 +14,48 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
 
-        $id = $request->id;
-        $harga = $request->harga;
+        $id = $request->makanan_id;
+        $subId = $request->sub_makanan;
+
+        // AMBIL DATA LANGSUNG DARI DATABASE BERDASARKAN ID
+        $makanan = Makanan::where('id_makanan', $id)->first();
+
+        if(!$makanan){
+            return redirect()->back()->with('error', 'Produk tidak ditemukan');
+        }
 
         $subNama = null;
         $subHarga = 0;
 
-        if($request->sub_makanan) {
-            $sub = SubMakanan::find($request->sub_makanan);
+        // AMBIL NAMA SUB MAKANAN (VARIAN)
+        if($subId){
+            // Pastikan nama kolom ID di tabel sub_makanans sudah sesuai
+            $sub = SubMakanan::where('id_sub_makanan', $subId)->first();
 
-            if($sub) {
-                $subNama = $sub->nama;
+            if($sub){
+                $subNama = $sub->nama; // Ini yang akan mengisi teks varian
                 $subHarga = $sub->tambahan_harga;
             }
         }
 
-        $finalHarga = $harga + $subHarga;
+        $finalHarga = $makanan->harga + $subHarga;
+        $cartKey = $id . '-' . ($subId ?? 0);
 
-        if(isset($cart[$id])) {
-            $cart[$id]['qty'] += $request->qty;
+        if(isset($cart[$cartKey])) {
+            $cart[$cartKey]['qty'] += $request->qty;
         } else {
-            $cart[$id] = [
-                "nama" => $request->nama,
-                "sub" => $subNama,
+            $cart[$cartKey] = [
+                "id" => $id,
+                "sub_id" => $subId,
+                "nama" => $makanan->nama,    // Diambil dari DB (Mie Gacoan, dll)
+                "sub" => $subNama,          // Diambil dari DB (Level 1, dll)
                 "harga" => $finalHarga,
-                "gambar" => $request->gambar,
+                "gambar" => asset('storage/'.$makanan->gambar),
                 "qty" => $request->qty
             ];
         }
 
         session()->put('cart', $cart);
-
         return redirect()->route('cart.index');
     }
 

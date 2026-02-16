@@ -81,8 +81,8 @@
                                 <div>
                                     <input type="radio"
                                            name="sub_makanan"
-                                           value="{{ $sub->id }}"
-                                           class="form-check-input me-2">
+                                           value="{{ $sub->id_sub_makanan }}"
+                                           class="form-check-input me-2" required>
                                     {{ $sub->nama }}
                                 </div>
                                 <span class="fw-bold text-primary">

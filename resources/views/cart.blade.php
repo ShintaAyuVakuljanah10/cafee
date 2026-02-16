@@ -34,12 +34,6 @@
                             {{ $item['nama'] }}
                         </h5>
 
-                        @if(!empty($item['level']))
-                        <small class="text-muted d-block">
-                            Level: <strong>{{ $item['level'] }}</strong>
-                        </small>
-                        @endif
-
                         @if(!empty($item['sub']))
                         <small class="text-muted d-block">
                             Varian: <strong>{{ $item['sub'] }}</strong>

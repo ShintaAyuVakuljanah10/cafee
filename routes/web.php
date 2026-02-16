@@ -38,7 +38,7 @@ Route::get('/order/{uuid}', function($uuid) {
 })->name('pelanggan.menu');
 
 // --- BACKEND ROUTES (Authenticated) ---
-Route::middleware(['auth'])->prefix('backend')->name('backend.')->group(function () {
+Route::middleware(['auth', 'log.agent'])->prefix('backend')->name('backend.')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [HomeController::class, 'index'])->name('home');

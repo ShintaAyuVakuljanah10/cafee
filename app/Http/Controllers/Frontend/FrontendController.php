@@ -53,9 +53,7 @@ class FrontendController extends Controller
 
         session()->put('cart', $cart);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Berhasil ditambahkan ke keranjang'
-        ]);
+        return redirect()->back()->with('success','Berhasil ditambahkan ke keranjang');
+
     }
 }
