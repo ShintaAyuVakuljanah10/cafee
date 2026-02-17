@@ -61,9 +61,15 @@
 
                 <div class="collapse navbar-collapse" id="navbarCollapse">
 
-                    <a href="{{ route('cart.index') }}" class="btn btn-primary ms-auto mt-3 mb-3">
+                    <a href="{{ route('cart.index') }}" class="btn btn-primary ms-auto mt-3 mb-3 position-relative">
                         <i class="bi bi-cart"></i>
-                    </a>
+                        @if(session('cart'))
+                            <span id="cart-badge"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ collect(session('cart'))->sum('qty') }}
+                            </span>
+                        @endif
+                    </a>    
 
                 </div>
 

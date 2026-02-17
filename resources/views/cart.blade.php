@@ -94,10 +94,13 @@
         </div>
 
         <div class="mt-4">
-            <a href="#" class="btn btn-primary w-100 shadow-sm py-3">
-                <i class="bi bi-credit-card me-2"></i>
-                Checkout Sekarang
-            </a>
+            <form action="{{ route('checkout.process') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-primary w-100 shadow-sm py-3">
+                    <i class="bi bi-credit-card me-2"></i>
+                    Checkout Sekarang
+                </button>
+            </form>
         </div>
 
         @else

@@ -13,8 +13,11 @@ use App\Http\Controllers\Backend\FileManagerController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\MakananController;
 use App\Http\Controllers\Backend\SubMakananController;
+use App\Http\Controllers\Backend\TransaksiController;
+use App\Http\Controllers\Backend\LaporanController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CheckoutController;
 
 // --- GUEST / PUBLIC ROUTES ---
 Route::get('/', [FrontendController::class, 'index']);
@@ -24,6 +27,9 @@ Route::post('/cart/add', [FrontendController::class, 'addToCart'])->name('cart.a
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+
+Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+Route::get('/struk/{id}', [CheckoutController::class, 'struk'])->name('checkout.struk');
 
 Route::get('/backend', function () { return view('auth.login'); });
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -133,5 +139,27 @@ Route::middleware(['auth', 'log.agent'])->prefix('backend')->name('backend.')->g
         Route::post('/store', [SubMakananController::class, 'store'])->name('store');
         Route::put('/{id}', [SubMakananController::class, 'update'])->name('update');
         Route::delete('/{id}', [SubMakananController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('transaksi')->name('transaksi.')->group(function () {
+
+        Route::get('/', [TransaksiController::class, 'index'])->name('index');
+        Route::get('/data', [TransaksiController::class, 'data'])->name('data');
+        Route::delete('/{id}', [TransaksiController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/cetak', [TransaksiController::class, 'cetak'])->name('cetak');
+        Route::post('/{id}/bayar', [TransaksiController::class, 'bayar'])->name('bayar');
+    });
+
+    Route::prefix('laporan')->name('laporan.')->group(function () {
+
+        Route::get('/', [LaporanController::class, 'index'])
+            ->name('index');
+
+        Route::get('/print', [LaporanController::class, 'print'])
+            ->name('print');
+
+        Route::get('/export', [LaporanController::class, 'export'])
+            ->name('export');
+
     });
 });

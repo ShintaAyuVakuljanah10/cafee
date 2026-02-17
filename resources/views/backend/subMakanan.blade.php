@@ -110,15 +110,31 @@
         $('#formSub').submit(function (e) {
             e.preventDefault();
 
-            $.post("{{ route('backend.sub-makanan.store') }}", {
-                id_makanan: $('#id_makanan').val(),
-                nama: $('#nama_sub').val(),
-                tambahan_harga: $('#tambahan_harga').val(),
-                _token: "{{ csrf_token() }}"
-            }, function () {
-                $('#modalSub').modal('hide');
-                loadData();
-                Swal.fire('Berhasil!', 'Sub makanan ditambahkan', 'success');
+            let id = $('#id_sub').val();
+            let url = id 
+                ? `/backend/sub-makanan/${id}` 
+                : "{{ route('backend.sub-makanan.store') }}";
+
+            let type = id ? "PUT" : "POST";
+
+            $.ajax({
+                url: url,
+                type: type,
+                data: {
+                    id_makanan: $('#id_makanan').val(),
+                    nama: $('#nama_sub').val(),
+                    tambahan_harga: $('#tambahan_harga').val(),
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function () {
+                    $('#modalSub').modal('hide');
+                    $('#formSub')[0].reset();
+                    $('#id_sub').val('');
+                    $('.modal-title').text('Tambah Sub Makanan');
+                    loadData();
+
+                    Swal.fire('Berhasil!', 'Data berhasil disimpan', 'success');
+                }
             });
         });
 

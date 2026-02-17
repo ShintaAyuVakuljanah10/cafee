@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\backend\Aplikasi;
 use App\Models\backend\SubMakanan;
 use Illuminate\Http\Request;
-use App\Models\backend\Makanan; // tambahkan ini
+use App\Models\backend\Makanan; 
 
 class CartController extends Controller
 {
@@ -17,7 +17,8 @@ class CartController extends Controller
         $id = $request->makanan_id;
         $subId = $request->sub_makanan;
 
-        // AMBIL DATA LANGSUNG DARI DATABASE BERDASARKAN ID
+        $key = $id . '-' . ($subNama ?? 'no-level');
+
         $makanan = Makanan::where('id_makanan', $id)->first();
 
         if(!$makanan){
@@ -27,13 +28,11 @@ class CartController extends Controller
         $subNama = null;
         $subHarga = 0;
 
-        // AMBIL NAMA SUB MAKANAN (VARIAN)
         if($subId){
-            // Pastikan nama kolom ID di tabel sub_makanans sudah sesuai
             $sub = SubMakanan::where('id_sub_makanan', $subId)->first();
 
             if($sub){
-                $subNama = $sub->nama; // Ini yang akan mengisi teks varian
+                $subNama = $sub->nama;
                 $subHarga = $sub->tambahan_harga;
             }
         }
@@ -47,8 +46,8 @@ class CartController extends Controller
             $cart[$cartKey] = [
                 "id" => $id,
                 "sub_id" => $subId,
-                "nama" => $makanan->nama,    // Diambil dari DB (Mie Gacoan, dll)
-                "sub" => $subNama,          // Diambil dari DB (Level 1, dll)
+                "nama" => $makanan->nama,    
+                "sub" => $subNama,
                 "harga" => $finalHarga,
                 "gambar" => asset('storage/'.$makanan->gambar),
                 "qty" => $request->qty

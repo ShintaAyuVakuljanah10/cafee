@@ -173,8 +173,8 @@
                     <div class="form-check mb-2">
                         <input class="form-check-input"
                             type="radio"
-                            name="level"
-                            value="${sub.id}"
+                            name="sub_makanan"
+                            value="${sub.id_sub_makanan}"
                             ${index === 0 ? "checked" : ""}>
                         <label class="form-check-label">
                             ${sub.nama} - Rp ${Number(sub.tambahan_harga).toLocaleString()}
@@ -204,10 +204,28 @@
 
         let id = currentItem.dataset.id;
         let nama = currentItem.dataset.nama;
-        let harga = currentItem.dataset.harga;
+        let harga = parseInt(currentItem.dataset.harga);
         let gambar = currentItem.dataset.gambar;
+        let subs = JSON.parse(currentItem.dataset.sub);
+
         let selectedSub = document.querySelector('input[name="sub_makanan"]:checked');
-        let subValue = selectedSub ? selectedSub.value : null;
+
+        let subValue = null;
+        let subNama = null;
+        let tambahanHarga = 0;
+
+        if (selectedSub) {
+            subValue = selectedSub.value;
+
+            let subData = subs.find(s => s.id_sub_makanan == subValue);
+
+            if (subData) {
+                subNama = subData.nama;
+                tambahanHarga = parseInt(subData.tambahan_harga);
+            }
+        }
+
+        let finalHarga = harga + tambahanHarga;
 
         fetch("{{ route('cart.add') }}", {
             method: "POST",
@@ -218,19 +236,38 @@
             body: JSON.stringify({
                 makanan_id: id,
                 nama: nama,
-                harga: harga,
+                harga_asli: harga,              
+                tambahan_harga: tambahanHarga,  
+                harga: finalHarga,              
                 gambar: gambar,
                 qty: 1,
-                sub_makanan: subValue
+                sub_makanan: subValue,
+                sub_nama: subNama
             })
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert("Berhasil masuk ke keranjang");
                 modal.hide();
+                updateCartBadge(data.total_items);
             }
         });
+    }
+
+    function updateCartBadge(total) {
+        let badge = document.getElementById('cart-badge');
+
+        if (!badge) {
+            const cartBtn = document.querySelector('.bi-cart').parentElement;
+            cartBtn.style.position = "relative";
+
+            badge = document.createElement('span');
+            badge.id = "cart-badge";
+            badge.className = "position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger";
+            cartBtn.appendChild(badge);
+        }
+
+        badge.innerText = total;
     }
 </script>
 @endpush

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\backend\Aplikasi;
 use App\Models\Backend\Category;
 use App\Models\Backend\Makanan;
+use App\Models\Backend\SubMakanan;
 use Illuminate\Http\Request;
 
 class FrontendController extends Controller
@@ -34,26 +35,36 @@ class FrontendController extends Controller
     }
 
     public function addToCart(Request $request)
-    {
-        $cart = session()->get('cart', []);
+{
+    $cart = session()->get('cart', []);
 
-        $id = $request->makanan_id;
+    $id = $request->makanan_id;
+    $subNama = null;
 
-        if (isset($cart[$id])) {
-            $cart[$id]['qty'] += $request->qty;
-        } else {
-            $cart[$id] = [
-                "nama"   => $request->nama,
-                "harga"  => $request->harga,
-                "gambar" => $request->gambar,
-                "qty"    => $request->qty,
-                "sub"    => $request->sub_makanan ?? null
-            ];
-        }
-
-        session()->put('cart', $cart);
-
-        return redirect()->back()->with('success','Berhasil ditambahkan ke keranjang');
-
+    if ($request->sub_makanan) {
+        $sub = SubMakanan::where('id_sub_makanan', $request->sub_makanan)->first();
+        $subNama = $sub ? $sub->nama : null;
     }
+
+    $key = $id . '-' . ($request->sub_makanan ?? '0');
+
+    if (isset($cart[$key])) {
+        $cart[$key]['qty'] += 1;
+    } else {
+        $cart[$key] = [
+            "nama"   => $request->nama,
+            "harga"  => $request->harga,
+            "gambar" => $request->gambar,
+            "qty"    => 1,
+            "sub"    => $subNama
+        ];
+    }
+
+    session()->put('cart', $cart);
+
+    return response()->json([
+        'success' => true,
+        'total_items' => collect($cart)->sum('qty')
+    ]);
+}
 }
