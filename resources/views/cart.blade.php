@@ -94,13 +94,26 @@
         </div>
 
         <div class="mt-4">
-            <form action="{{ route('checkout.process') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary w-100 shadow-sm py-3">
-                    <i class="bi bi-credit-card me-2"></i>
-                    Checkout Sekarang
-                </button>
-            </form>
+            <div class="row g-3">
+        
+                <div class="col-md-6">
+                    <a href="/" class="btn btn-outline-secondary w-100 shadow-sm py-3">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Tambah Menu
+                    </a>
+                </div>
+        
+                <div class="col-md-6">
+                    <button type="button" 
+                            class="btn btn-primary w-100 shadow-sm py-3"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#checkoutModal">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Checkout
+                    </button>
+                </div>
+        
+            </div>
         </div>
 
         @else
@@ -117,5 +130,56 @@
 
     </div>
 </section>
+
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Data Pemesan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="{{ route('checkout.process') }}" method="POST">
+                @csrf
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="fw-bold">Nama</label>
+                        <input type="text" 
+                               name="nama" 
+                               class="form-control" 
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fw-bold">No Meja</label>
+                        <input type="text" 
+                               class="form-control" 
+                               value="{{ session('no_meja') }}" 
+                               readonly>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            data-bs-dismiss="modal">
+                        Batal
+                    </button>
+
+                    <button type="submit" 
+                            class="btn btn-primary">
+                        Lanjutkan Checkout
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 
 @endsection

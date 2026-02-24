@@ -13,6 +13,10 @@ class CheckoutController extends Controller
 {
     public function process(Request $request)
     {
+        $request->validate([
+            'nama' => 'required'
+        ]);
+
         $cart = session('cart');
 
         if (!$cart || count($cart) == 0) {
@@ -29,23 +33,32 @@ class CheckoutController extends Controller
 
         $transaksi = Transaksi::create([
             'kode_transaksi' => $kode,
-            'total' => $total,
-            'status' => 'pending'
+            'nama_customer'  => $request->nama,
+            'no_meja'        => session('nomor_meja'),
+            'total'          => $total,
+            'status'         => 'pending'
         ]);
 
         foreach ($cart as $item) {
             TransaksiDetail::create([
                 'transaksi_id' => $transaksi->id,
-                'nama_produk' => $item['nama'],
-                'harga' => $item['harga'],
-                'qty' => $item['qty'],
-                'subtotal' => $item['harga'] * $item['qty'],
+                'nama_produk'  => $item['nama'],
+                'harga'        => $item['harga'],
+                'qty'          => $item['qty'],
+                'subtotal'     => $item['harga'] * $item['qty'],
             ]);
         }
 
         session()->forget('cart');
 
-        return redirect()->route('checkout.struk', $transaksi->id);
+        return redirect()->route('checkout.barcode', $transaksi->id);
+    }
+
+    public function barcode($id)
+    {
+        $app = Aplikasi::first(); 
+        $transaksi = Transaksi::findOrFail($id);
+        return view('barcode', compact('transaksi','app'));
     }
 
     public function struk($id)

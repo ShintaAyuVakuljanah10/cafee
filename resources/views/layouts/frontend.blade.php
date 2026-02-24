@@ -7,6 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
@@ -62,15 +63,15 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
 
                     <a href="{{ route('cart.index') }}" class="btn btn-primary ms-auto mt-3 mb-3 position-relative">
-                        <i class="bi bi-cart"></i>
-                        @if(session('cart'))
-                            <span id="cart-badge"
-                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ collect(session('cart'))->sum('qty') }}
-                            </span>
-                        @endif
-                    </a>    
 
+                        <i class="bi bi-cart"></i>
+
+                        <span id="cart-badge"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ collect(session('cart', []))->sum('qty') }}
+                        </span>
+
+                    </a>
                 </div>
 
             </nav>

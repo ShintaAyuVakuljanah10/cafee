@@ -38,6 +38,7 @@
         width: 90px;
         text-align: center;
     }
+
 </style>
 
 <section class="detail-wrapper">
@@ -45,8 +46,7 @@
         <div class="row align-items-center">
 
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="{{ asset('storage/'.$makanan->gambar) }}"
-                     class="product-img shadow-sm">
+                <img src="{{ asset('storage/'.$makanan->gambar) }}" class="product-img shadow-sm">
             </div>
 
             <div class="col-lg-6">
@@ -60,56 +60,48 @@
                 </div>
 
                 @if($makanan->deskripsi)
-                    <p class="text-muted mb-4">
-                        {{ $makanan->deskripsi }}
-                    </p>
+                <p class="text-muted mb-4">
+                    {{ $makanan->deskripsi }}
+                </p>
                 @endif
 
-                <form action="{{ route('cart.add') }}" method="POST">
+                <form id="cartForm">
                     @csrf
-
+                    
                     <input type="hidden" name="makanan_id" value="{{ $makanan->id_makanan }}">
                     <input type="hidden" name="nama" value="{{ $makanan->nama }}">
                     <input type="hidden" name="harga" value="{{ $makanan->harga }}">
                     <input type="hidden" name="gambar" value="{{ asset('storage/'.$makanan->gambar) }}">
 
                     @if($makanan->subMakanans->count() > 0)
-                        <h5 class="fw-bold mb-3">Pilih Varian</h5>
+                    <h5 class="fw-bold mb-3">Pilih Varian</h5>
 
-                        @foreach($makanan->subMakanans as $sub)
-                            <label class="varian-item w-100 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <input type="radio"
-                                           name="sub_makanan"
-                                           value="{{ $sub->id_sub_makanan }}"
-                                           class="form-check-input me-2" required>
-                                    {{ $sub->nama }}
-                                </div>
-                                <span class="fw-bold text-primary">
-                                    +Rp {{ number_format($sub->tambahan_harga) }}
-                                </span>
-                            </label>
-                        @endforeach
+                    @foreach($makanan->subMakanans as $sub)
+                    <label class="varian-item w-100 d-flex justify-content-between align-items-center">
+                        <div>
+                            <input type="radio" name="sub_makanan" value="{{ $sub->id_sub_makanan }}"
+                                class="form-check-input me-2" required>
+                            {{ $sub->nama }}
+                        </div>
+                        <span class="fw-bold text-primary">
+                            +Rp {{ number_format($sub->tambahan_harga) }}
+                        </span>
+                    </label>
+                    @endforeach
                     @endif
 
                     <div class="mt-4">
                         <label class="fw-bold mb-2">Jumlah</label>
-                        <input type="number"
-                               name="qty"
-                               class="form-control qty-box"
-                               value="1"
-                               min="1">
+                        <input type="number" name="qty" class="form-control qty-box" value="1" min="1">
                     </div>
 
-                    <button type="submit"
-                            class="btn btn-primary w-100 mt-4 shadow-sm">
+                    <button type="submit" class="btn btn-primary w-100 mt-4 shadow-sm">
                         <i class="bi bi-cart-plus me-2"></i>
                         Tambah ke Keranjang
                     </button>
                 </form>
 
-                <a href="{{ url()->previous() }}"
-                   class="btn btn-outline-secondary w-100 mt-3 rounded-3">
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary w-100 mt-3 rounded-3">
                     Kembali
                 </a>
 
@@ -118,4 +110,26 @@
     </div>
 </section>
 
+<script>
+    document.getElementById("cartForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+    
+        let formData = new FormData(this);
+    
+        fetch("{{ route('cart.add') }}", {
+            method: "POST",
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                document.getElementById("cart-badge").innerText = data.total_items;
+            }
+        })
+        .catch(error => console.log(error));
+    });
+    </script>
 @endsection

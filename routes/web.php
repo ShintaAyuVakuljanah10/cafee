@@ -21,14 +21,22 @@ use App\Http\Controllers\Frontend\CheckoutController;
 
 // --- GUEST / PUBLIC ROUTES ---
 Route::get('/', [FrontendController::class, 'index']);
-Route::get('/menu/{id}', [FrontendController::class, 'detail'])->name('menu.detail');
+Route::get('/scan/{uuid}', function($uuid) {
+    $meja = \App\Models\Backend\Meja::where('uuid', $uuid)->firstOrFail();
+    session([
+        'id_meja' => $meja->id,
+        'no_meja' => $meja->nomor_meja
+    ]);
+    return redirect('/');})->name('pelanggan.scan');
+Route::get('/menu/detail/{id}', [FrontendController::class, 'detail'])->name('menu.detail');
 
 Route::post('/cart/add', [FrontendController::class, 'addToCart'])->name('cart.add');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 
-Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+Route::get('/checkout/barcode/{id}', [CheckoutController::class, 'barcode'])->name('checkout.barcode');
 Route::get('/struk/{id}', [CheckoutController::class, 'struk'])->name('checkout.struk');
 
 Route::get('/backend', function () { return view('auth.login'); });

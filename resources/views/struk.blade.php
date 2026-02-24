@@ -75,6 +75,12 @@
                 Terima kasih atas kunjungan Anda
             </div>
 
+            <div class="text-center mt-3">
+                <a href="{{ url('/') }}" class="btn btn-primary btn-sm">
+                    Kembali ke Beranda
+                </a>
+            </div>
+
         </div>
 
     </div>

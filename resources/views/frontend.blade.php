@@ -160,8 +160,7 @@
         let subs = JSON.parse(item.dataset.sub);
 
         document.getElementById('modalNama').innerText = nama;
-        document.getElementById('modalHarga').innerText =
-            "Rp " + Number(harga).toLocaleString();
+        document.getElementById('modalHarga').innerText = "Rp " + Number(harga).toLocaleString();
         document.getElementById('modalGambar').src = gambar;
 
         let levelContainer = document.getElementById('levelOptions');
@@ -183,25 +182,13 @@
                 `;
             });
         } else {
-            levelContainer.innerHTML += `
-                <div class="form-check mb-2">
-                    <input class="form-check-input"
-                        type="radio"
-                        name="sub_makanan"
-                        value="${sub.id}"
-                        ${index === 0 ? "checked" : ""}>
-                    <label class="form-check-label">
-                        ${sub.nama} - Rp ${Number(sub.tambahan_harga).toLocaleString()}
-                    </label>
-                </div>
-            `;
+            levelContainer.innerHTML = `<p class="text-muted">Tidak ada varian untuk menu ini</p>`;
         }
 
         modal.show();
     }
 
     function addToCart() {
-
         let id = currentItem.dataset.id;
         let nama = currentItem.dataset.nama;
         let harga = parseInt(currentItem.dataset.harga);
@@ -216,9 +203,7 @@
 
         if (selectedSub) {
             subValue = selectedSub.value;
-
             let subData = subs.find(s => s.id_sub_makanan == subValue);
-
             if (subData) {
                 subNama = subData.nama;
                 tambahanHarga = parseInt(subData.tambahan_harga);
@@ -236,12 +221,12 @@
             body: JSON.stringify({
                 makanan_id: id,
                 nama: nama,
-                harga_asli: harga,              
-                tambahan_harga: tambahanHarga,  
-                harga: finalHarga,              
+                harga_asli: harga,
+                tambahan_harga: tambahanHarga,
+                harga: finalHarga,
                 gambar: gambar,
                 qty: 1,
-                sub_makanan: subValue,
+                sub_makanan: subValue, // null jika tidak ada level
                 sub_nama: subNama
             })
         })

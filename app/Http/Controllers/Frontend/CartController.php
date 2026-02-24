@@ -54,8 +54,12 @@ class CartController extends Controller
             ];
         }
 
-        session()->put('cart', $cart);
-        return redirect()->route('cart.index');
+        $totalItems = collect($cart)->sum('qty');
+
+        return response()->json([
+            'success' => true,
+            'total_items' => $totalItems
+        ]);
     }
 
     public function index()
