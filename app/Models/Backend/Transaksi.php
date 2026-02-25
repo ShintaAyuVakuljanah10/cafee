@@ -21,4 +21,9 @@ class Transaksi extends Model
     {
         return $this->hasMany(TransaksiDetail::class, 'transaksi_id');
     }
+    public function meja()
+    {
+        return $this->belongsTo(\App\Models\Backend\Meja::class, 'id_meja');
+    }
+    
 }

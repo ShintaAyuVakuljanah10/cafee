@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class CheckoutController extends Controller
 {
     public function process(Request $request)
-    {
+    {   
         $request->validate([
             'nama' => 'required'
         ]);
@@ -30,11 +30,11 @@ class CheckoutController extends Controller
         }
 
         $kode = 'TRX-' . strtoupper(Str::random(8));
-
+        
         $transaksi = Transaksi::create([
             'kode_transaksi' => $kode,
             'nama_customer'  => $request->nama,
-            'no_meja'        => session('nomor_meja'),
+            'id_meja'        => session('id_meja'),
             'total'          => $total,
             'status'         => 'pending'
         ]);
@@ -57,7 +57,7 @@ class CheckoutController extends Controller
     public function barcode($id)
     {
         $app = Aplikasi::first(); 
-        $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::with('meja')->findOrFail($id);
         return view('barcode', compact('transaksi','app'));
     }
 

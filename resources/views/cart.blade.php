@@ -156,9 +156,9 @@
                     <div class="mb-3">
                         <label class="fw-bold">No Meja</label>
                         <input type="text" 
-                               class="form-control" 
-                               value="{{ session('no_meja') }}" 
-                               readonly>
+                            class="form-control" 
+                            value="{{ session('nomor_meja') }}" 
+                            readonly>
                     </div>
 
                 </div>

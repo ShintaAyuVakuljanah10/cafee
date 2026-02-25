@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Backend\Transaksi;
 use App\Models\backend\Aplikasi;
+use App\Models\backend\Menu;
 use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
@@ -76,5 +77,11 @@ class TransaksiController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+    public function kasir()
+    {
+        $menus = \App\Models\Backend\Makanan::all(); // sesuaikan model kamu
+        $submenus = Menu::with('subMenus')->get();
+        return view('backend.kasir', compact('menus', 'submenus'));
     }
 }

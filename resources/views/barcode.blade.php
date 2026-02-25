@@ -9,15 +9,17 @@
 
             <!-- No Meja -->
             <h4 class="fw-bold">
-                No Meja: {{ $transaksi->nomor_meja }}
+                No Meja: {{ $transaksi->meja->nomor_meja ?? '-' }}
             </h4>
             
             <h5 class="mb-4">
                 {{ $transaksi->nama_customer }}
             </h5>
 
-            <div class="my-4 text-center">  
-                {!! DNS1D::getBarcodeHTML($transaksi->kode_transaksi, 'C128', 2, 90) !!}
+            <div class="my-4 d-flex justify-content-center align-items-center">
+                <div>
+                    {!! DNS1D::getBarcodeHTML($transaksi->kode_transaksi, 'C128', 2, 90) !!}
+                </div>
             </div>
 
             <!-- Kode transaksi -->

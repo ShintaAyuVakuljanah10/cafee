@@ -47,8 +47,13 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 // --- CUSTOMER SCAN QR (Public) ---
 Route::get('/order/{uuid}', function($uuid) {
     $meja = \App\Models\Backend\Meja::where('uuid', $uuid)->firstOrFail();
-    session(['id_meja' => $meja->id, 'nomor_meja' => $meja->nomor_meja]);
-    return "<h1>Selamat Datang!</h1><p>Meja " . $meja->nomor_meja . "</p>";
+
+    session([
+        'id_meja' => $meja->id,
+        'nomor_meja' => $meja->nomor_meja
+    ]);
+
+    return redirect('/');
 })->name('pelanggan.menu');
 
 // --- BACKEND ROUTES (Authenticated) ---
@@ -156,6 +161,9 @@ Route::middleware(['auth', 'log.agent'])->prefix('backend')->name('backend.')->g
         Route::delete('/{id}', [TransaksiController::class, 'destroy'])->name('destroy');
         Route::get('/{id}/cetak', [TransaksiController::class, 'cetak'])->name('cetak');
         Route::post('/{id}/bayar', [TransaksiController::class, 'bayar'])->name('bayar');
+        // ===== KASIR POS =====
+        Route::get('/kasir', [TransaksiController::class, 'kasir'])->name('kasir');
+        Route::post('/store', [TransaksiController::class, 'store'])->name('store');
     });
 
     Route::prefix('laporan')->name('laporan.')->group(function () {
