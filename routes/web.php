@@ -71,6 +71,8 @@ Route::middleware(['auth', 'log.agent'])->prefix('backend')->name('backend.')->g
         Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
         Route::put('/{id}', [UserController::class, 'update'])->name('update');
         Route::delete('/{id}', [UserController::class, 'delete'])->name('hapus');
+        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+        Route::put('/profile/update', [UserController::class, 'profileUpdate'])->name('profile.update');
     });
 
     // Roles Management

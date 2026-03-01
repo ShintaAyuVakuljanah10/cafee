@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -90,6 +91,50 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(['message' => 'User berhasil dihapus']);
+    }
+    public function profile()
+    {
+        // Mengambil data user yang sedang login
+        $user = Auth::user();
+        return view('backend.profileUpdate', compact('user'));
+    }
+    public function profileUpdate(Request $request)
+    {
+        // 1. Ambil user yang sedang login
+        $user = Auth::user(); 
+
+        // 2. Validasi
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'password' => 'nullable|min:6',
+            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
+
+        // 3. Update Data
+        $user->name = $request->name;
+        $user->username = $request->username;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // 4. Handle Foto
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($user->foto && file_exists(public_path('storage/' . $user->foto))) {
+                unlink(public_path('storage/' . $user->foto));
+            }
+            $user->foto = $request->file('foto')->store('users', 'public');
+        }
+
+        $user->save();
+
+        // 5. Kembalikan Response JSON (Wajib untuk AJAX)
+        return response()->json([
+            'success' => true, 
+            'message' => 'Profil berhasil diperbarui!'
+        ]);
     }
 
 

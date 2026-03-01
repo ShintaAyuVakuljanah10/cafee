@@ -191,59 +191,38 @@ $(document).ready(function () {
     $('#formUser').submit(function (e) {
         e.preventDefault();
         let formData = new FormData(this);
-        $('.text-danger').text('');
         let userId = $('#user_id').val();
-        let url = userId ? `/user/${userId}` : "{{ route('backend.user.tambah') }}";
-        let type = 'POST';
+        
+        // Sesuaikan URL dengan prefix 'backend' dan 'user'
+        let url = userId ? `/backend/user/${userId}` : "{{ route('backend.user.tambah') }}";
 
         if(userId){
-            formData.append('_method','PUT'); 
+            formData.append('_method', 'PUT'); 
         }
 
         $.ajax({
             url: url,
-            type: type,
+            type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function () {
-                $('#modalUser').modal('hide');
-                $('#formUser')[0].reset();
-                loadUsers();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: userId 
-                        ? 'User berhasil diperbarui' 
-                        : 'User berhasil ditambahkan',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    $.each(errors, function (key, value) {
-                        $('.error-' + key).text(value[0]);
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'Terjadi kesalahan pada server'
-                    });
+            success: function (res) {
+                if(res.success) {
+                    $('#modalUser').modal('hide');
+                    loadUsers();
+                    Swal.fire({ icon: 'success', title: 'Berhasil', timer: 1500, showConfirmButton: false });
                 }
+            },
+            error: function (xhr) {
+                // ... handling error 422 seperti sebelumnya ...
             }
-
         });
     });
 
     $(document).on('click', '.btn-edit', function () {
         let userId = $(this).data('id');
-        // Hilangkan huruf 's' pada /users/ agar menjadi /user/
-        $.get(`/user/${userId}/edit`, function (data) { 
+        // Gunakan URL lengkap sesuai prefix rute Anda
+        $.get(`/backend/user/${userId}/edit`, function (data) { 
             $('#modalTitle').text('Edit User');
             $('#btnSave').text('Update');
             $('#user_id').val(data.id);

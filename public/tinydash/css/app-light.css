@@ -12054,3 +12054,17 @@ a.uppy-Dashboard-poweredBy {
     max-height: 200px; /* Batasi tinggi agar muncul scrollbar */
     overflow-y: auto;
 }
+.profile-pic-custom {
+    width: 100px;           /* Sesuaikan ukuran yang diinginkan */
+    height: 100px;          /* Harus sama dengan width agar jadi kotak */
+    object-fit: cover;      /* Memastikan foto tidak lonjong/penyet */
+    object-position: center; /* Memastikan fokus foto di tengah */
+    border-radius: 50%;     /* Membuat bulat sempurna */
+    border: 2px solid #ddd; /* Opsional: memberi garis tepi */
+}
+
+/* Jika ini untuk avatar kecil di Navbar */
+.navbar .profile-pic-custom {
+    width: 40px;
+    height: 40px;
+}
