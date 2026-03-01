@@ -27,6 +27,7 @@
     <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
       <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    @stack('style')
   </head>
   <body class="vertical  light  ">
     <div class="wrapper">

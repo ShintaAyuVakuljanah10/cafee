@@ -17,7 +17,6 @@ class CartController extends Controller
         $id = $request->makanan_id;
         $subId = $request->sub_makanan;
 
-        $key = $id . '-' . ($subNama ?? 'no-level');
 
         $makanan = Makanan::where('id_makanan', $id)->first();
 
@@ -53,6 +52,8 @@ class CartController extends Controller
                 "qty" => $request->qty
             ];
         }
+
+        session()->put('cart', $cart);
 
         $totalItems = collect($cart)->sum('qty');
 

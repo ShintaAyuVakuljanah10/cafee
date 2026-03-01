@@ -18,6 +18,7 @@ use App\Http\Controllers\Backend\LaporanController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
+use App\Models\Backend\Transaksi;
 
 // --- GUEST / PUBLIC ROUTES ---
 Route::get('/', [FrontendController::class, 'index']);
@@ -164,6 +165,9 @@ Route::middleware(['auth', 'log.agent'])->prefix('backend')->name('backend.')->g
         // ===== KASIR POS =====
         Route::get('/kasir', [TransaksiController::class, 'kasir'])->name('kasir');
         Route::post('/store', [TransaksiController::class, 'store'])->name('store');
+        Route::get('/kasir/barcode/{kode}', [TransaksiController::class,'scanBarcode']);
+        Route::post('/kasir/checkout',[TransaksiController::class,'checkout'])->name('checkout');
+        Route::get('/pembayaran/{kode}',[TransaksiController::class,'pembayaran'])->name('pembayaran');
     });
 
     Route::prefix('laporan')->name('laporan.')->group(function () {
