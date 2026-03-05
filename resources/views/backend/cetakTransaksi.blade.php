@@ -153,12 +153,12 @@
 
                 <div class="d-flex-between">
                     <span>BAYAR</span>
-                    <span>Rp {{ number_format($transaksi->bayar ?? 0) }}</span>
+                    <span>Rp {{ number_format($bayar) }}</span>
                 </div>
-                
+
                 <div class="d-flex-between">
                     <span>KEMBALI</span>
-                    <span>Rp {{ number_format(($transaksi->bayar ?? 0) - $transaksi->total) }}</span>
+                    <span>Rp {{ number_format($kembali) }}</span>
                 </div>
 
                 <div class="line">----------------------------------</div>

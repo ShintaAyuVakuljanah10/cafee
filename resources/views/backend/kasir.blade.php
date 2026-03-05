@@ -164,7 +164,7 @@
 
             subs.forEach(function (sub, index) {
 
-                let tambahanHarga = parseInt(sub.harga || 0);
+                let tambahanHarga = parseInt(sub.tambahan_harga || 0);
 
                 container.append(`
                     <div class="form-check mb-2">

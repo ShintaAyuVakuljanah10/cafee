@@ -66,9 +66,15 @@ class TransaksiController extends Controller
     public function cetak($id)
     {
         $app = Aplikasi::first();
-        $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::with('details')->findOrFail($id);
 
-        return view('backend.cetakTransaksi', compact('transaksi','app'));
+        $bayar = $transaksi->bayar ?? 0;
+        
+        $kembali = max($bayar - $transaksi->total, 0);
+
+        return view('backend.cetakTransaksi', compact(
+            'transaksi','app','bayar','kembali'
+        ));
     }
 
     public function bayar($id)
