@@ -62,7 +62,7 @@
                         statusBadge,
                         `
                         <div class="btn-group btn-group-sm">
-                            <a href="/backend/transaksi/${item.id}/cetak"
+                            <a href="/backend/transaksi/${item.id}/cetak?bayar=${item.bayar}&kembali=${item.kembali}"
                                 target="_blank"
                                 class="btn btn-outline-success">
                                 <i class="mdi mdi-printer"></i>

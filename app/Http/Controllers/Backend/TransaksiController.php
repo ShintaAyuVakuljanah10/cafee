@@ -65,27 +65,41 @@ class TransaksiController extends Controller
 
     public function cetak($id)
     {
-        $app = Aplikasi::first();
         $transaksi = Transaksi::with('details')->findOrFail($id);
+        $app = Aplikasi::first();
 
-        $bayar = $transaksi->bayar ?? 0;
-        
-        $kembali = max($bayar - $transaksi->total, 0);
+        $bayar = request('bayar');
+        $kembali = request('kembali');
 
         return view('backend.cetakTransaksi', compact(
-            'transaksi','app','bayar','kembali'
+            'transaksi',
+            'app',
+            'bayar',
+            'kembali'
         ));
     }
 
-    public function bayar($id)
-    {
+    public function bayar(Request $request, $id)
+    {   
         $transaksi = Transaksi::findOrFail($id);
+
+        $bayar = (int) $request->bayar;
+        $total = (int) $transaksi->total;
+        $kembali = $bayar - $total;
+
         $transaksi->update([
-            'status' => 'lunas'
+            'status' => 'lunas',
+            'bayar' => $bayar,
+            'kembali' => $kembali
         ]);
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'bayar' => $bayar,
+            'kembali' => $kembali
+        ]);
     }
+
     public function kasir()
     {
         $menus = \App\Models\Backend\Makanan::with('subMakanans')->get();
@@ -109,17 +123,20 @@ class TransaksiController extends Controller
     {
         $cart = $request->cart;
 
-        if(empty($cart)){
-            return response()->json(['error'=>'Cart kosong']);
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart kosong'
+            ]);
         }
 
-        $kode = 'TRX-'.Str::upper(Str::random(8));
+        $kode = 'TRX-' . Str::upper(Str::random(8));
         $total = 0;
 
         $transaksi = Transaksi::create([
-            'kode_transaksi'=>$kode,
-            'total'=>0,
-            'status'=>'pending'
+            'kode_transaksi' => $kode,
+            'total' => 0,
+            'status' => 'pending'
         ]);
 
         foreach ($cart as $item) {
@@ -137,11 +154,14 @@ class TransaksiController extends Controller
         }
 
         $transaksi->update([
-            'total'=>$total
+            'total' => $total
         ]);
 
         return response()->json([
-            'kode'=>$kode
+            'success' => true,
+            'transaksi_id' => $transaksi->id,
+            'kode' => $kode,
+            'total' => $total
         ]);
     }
     

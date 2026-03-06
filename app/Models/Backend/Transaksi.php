@@ -14,7 +14,9 @@ class Transaksi extends Model
         'nama_customer',
         'no_meja',
         'total',
-        'status'
+        'status',
+        'bayar',
+        'kembali'
     ];
 
     public function details()
