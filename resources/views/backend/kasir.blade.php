@@ -137,7 +137,6 @@
     let cart = [];
 
     function openModal(button) {
-
         let item = button.closest('.menu-item');
         currentItem = item;
 
@@ -148,8 +147,11 @@
         let subs = [];
 
         try {
-            subs = JSON.parse(item.dataset.sub);
+            // Ambil string JSON dari data-sub
+            let rawSub = item.getAttribute('data-sub'); 
+            subs = JSON.parse(rawSub);
         } catch (e) {
+            console.error("Gagal parse JSON sub-menu:", e);
             subs = [];
         }
 
@@ -160,11 +162,10 @@
         let container = $('#levelOptions');
         container.html("");
 
-        if (subs.length > 0) {
-
+        if (subs && subs.length > 0) {
             subs.forEach(function (sub, index) {
-
-                let tambahanHarga = parseInt(sub.harga || 0);
+                // PASTIKAN properti di bawah ini sesuai dengan field di database (e.g., 'harga' atau 'tambahan_harga')
+                let tambahanHarga = parseInt(sub.tambahan_harga || 0);
 
                 container.append(`
                     <div class="form-check mb-2">
@@ -180,17 +181,9 @@
                         </label>
                     </div>
                 `);
-
             });
-
         } else {
-
-            container.html(`
-            <div class="alert alert-light text-center mb-0">
-                Tidak ada varian untuk menu ini
-            </div>
-        `);
-
+            container.html(`<div class="alert alert-light text-center mb-0">Tidak ada varian</div>`);
         }
 
         $('#menuModal').modal('show');
@@ -199,39 +192,39 @@
 
     function addToCart(){
 
-    let id = currentItem.dataset.id;
-    let nama = currentItem.dataset.nama;
-    let harga = parseInt(currentItem.dataset.harga);
+        let id = currentItem.dataset.id;
+        let nama = currentItem.dataset.nama;
+        let harga = parseInt(currentItem.dataset.harga);
 
-    let sub = $('#menuModal input[name="sub_makanan"]:checked');
+        let sub = $('#menuModal input[name="sub_makanan"]:checked');
 
-    let subId = sub.val() || 0;
-    let subNama = sub.data('nama') || '';
-    let tambahanHarga = parseInt(sub.data('harga') || 0);
+        let subId = sub.val() || 0;
+        let subNama = sub.data('nama') || '';
+        let tambahanHarga = parseInt(sub.data('harga') || 0);
 
-    let finalHarga = harga + tambahanHarga;
+        let finalHarga = harga + tambahanHarga;
 
-    // KEY UNIK
-    let key = id + "-" + subId + "-" + tambahanHarga;
+        // KEY UNIK
+        let key = id + "-" + subId + "-" + tambahanHarga;
 
-    let item = cart.find(i => i.key == key);
+        let item = cart.find(i => i.key == key);
 
-    if(item){
-        item.qty++;
-    }else{
-        cart.push({
-            key:key,
-            id:id,
-            nama:nama,
-            sub:subNama,
-            harga:finalHarga,
-            qty:1
-        });
+        if(item){
+            item.qty++;
+        }else{
+            cart.push({
+                key:key,
+                id:id,
+                nama:nama,
+                sub:subNama,
+                harga:finalHarga,
+                qty:1
+            });
+        }
+
+        renderCart();
+        $('#menuModal').modal('hide');
     }
-
-    renderCart();
-    $('#menuModal').modal('hide');
-}
 
 
     function renderCart(){
